@@ -1,0 +1,33 @@
+{
+  "team": "康軒演講準備工作",
+  "hub": {
+    "port": 3003
+  },
+  "roles": [
+    {
+      "name": "總指揮",
+      "role": "pm",
+      "cli": "claude",
+      "cwd": "/Users/vivichen/code/slide-knsh",
+      "systemPrompt": "pm-prompt.md"
+    },
+    {
+      "name": "內容研究員",
+      "role": "content-researcher",
+      "cli": "claude",
+      "cwd": "/Users/vivichen/code/slide-knsh"
+    },
+    {
+      "name": "簡報架構師",
+      "role": "presentation-architect",
+      "cli": "claude",
+      "cwd": "/Users/vivichen/code/slide-knsh"
+    },
+    {
+      "name": "受眾分析師",
+      "role": "audience-analyst",
+      "cli": "claude",
+      "cwd": "/Users/vivichen/code/slide-knsh"
+    }
+  ]
+}

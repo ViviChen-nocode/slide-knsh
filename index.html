@@ -347,6 +347,54 @@ h3 {
 .pulse-text {
   animation: pulse-scale 2s ease-in-out infinite;
 }
+
+/* Chegg stock crash animation */
+/* Typewriter effect */
+.typewriter-text::after {
+  content: '|';
+  animation: blink-cursor 0.7s step-end infinite;
+  font-weight: 300;
+  color: var(--text-muted);
+}
+.typewriter-text.done::after {
+  display: none;
+}
+@keyframes blink-cursor {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.chegg-line {
+  stroke-dasharray: 1200;
+  stroke-dashoffset: 1200;
+  transition: none;
+}
+.chegg-line.animate {
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 2.5s ease-in-out;
+}
+.chegg-clip-rect {
+  width: 0;
+  transition: none;
+}
+.chegg-clip-rect.animate {
+  width: 700px;
+  transition: width 2.5s ease-in-out;
+}
+.chegg-dot-start.animate {
+  opacity: 1 !important;
+  transition: opacity 0.3s ease 0.1s;
+}
+.chegg-dot-end.animate {
+  opacity: 1 !important;
+  transition: opacity 0.3s ease 2.4s;
+}
+.drop-label {
+  transition: opacity 0.4s ease;
+}
+.drop-label.hidden {
+  opacity: 0;
+}
 .mindmap-bubble {
   position: absolute;
   background: #FFF;
@@ -864,7 +912,7 @@ h3 {
 <!-- ===== P3 — Story Setup ===== -->
 <section class="slide slide-p3">
   <div class="slide-inner">
-    <h1 style="font-size:clamp(2rem,4vw,3.2rem);line-height:1.4;">當 AI 講師的兒子<br>用 AI 寫作業......</h1>
+    <h1 class="typewriter-text" style="font-size:clamp(2rem,4vw,3.2rem);line-height:1.4;" data-text="當 AI 講師的孩子用 AI 寫作業......"></h1>
     <div class="scene-icons">
       <div class="scene-icon">
         <div class="scene-icon-circle">
@@ -1136,16 +1184,19 @@ h3 {
         <!-- ChatGPT marker -->
         <line x1="386" y1="25" x2="386" y2="250" stroke="#E53935" stroke-width="1" stroke-dasharray="5,4" opacity="0.4"/>
         <text x="394" y="42" font-family="Inter, sans-serif" font-size="9" fill="#E53935" opacity="0.7">ChatGPT 問世</text>
-        <!-- Area fill -->
-        <path d="M120,35 C160,33 190,36 230,42 C260,48 290,58 330,70 C350,76 370,80 386,82 C400,130 420,175 460,205 C500,225 540,235 580,240 C620,243 660,245 700,247 L750,248 L750,250 L120,250 Z" fill="url(#cheggGrad)"/>
-        <!-- Stock line -->
-        <path d="M120,35 C160,33 190,36 230,42 C260,48 290,58 330,70 C350,76 370,80 386,82 C400,130 420,175 460,205 C500,225 540,235 580,240 C620,243 660,245 700,247 L750,248" fill="none" stroke="#E53935" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <!-- Area fill (animated via clip) -->
+        <clipPath id="cheggClip">
+          <rect x="80" y="0" width="0" height="280" class="chegg-clip-rect"/>
+        </clipPath>
+        <path d="M120,35 C160,33 190,36 230,42 C260,48 290,58 330,70 C350,76 370,80 386,82 C400,130 420,175 460,205 C500,225 540,235 580,240 C620,243 660,245 700,247 L750,248 L750,250 L120,250 Z" fill="url(#cheggGrad)" clip-path="url(#cheggClip)"/>
+        <!-- Stock line (animated draw) -->
+        <path class="chegg-line" d="M120,35 C160,33 190,36 230,42 C260,48 290,58 330,70 C350,76 370,80 386,82 C400,130 420,175 460,205 C500,225 540,235 580,240 C620,243 660,245 700,247 L750,248" fill="none" stroke="#E53935" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
         <!-- Peak dot -->
-        <circle cx="120" cy="35" r="4" fill="#E53935"/>
-        <text x="132" y="30" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#E53935">$113</text>
+        <circle cx="120" cy="35" r="4" fill="#E53935" class="chegg-dot-start" style="opacity:0;"/>
+        <text x="132" y="30" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#E53935" class="chegg-dot-start" style="opacity:0;">$113</text>
         <!-- End dot -->
-        <circle cx="750" cy="248" r="4" fill="#E53935"/>
-        <text x="718" y="243" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#E53935">$0.58</text>
+        <circle cx="750" cy="248" r="4" fill="#E53935" class="chegg-dot-end" style="opacity:0;"/>
+        <text x="718" y="243" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#E53935" class="chegg-dot-end" style="opacity:0;">$0.58</text>
       </svg>
     </div>
     <div class="drop-label">-99%</div>
@@ -1537,12 +1588,56 @@ h3 {
     });
   }
 
+  // Typewriter animation
+  let typewriterAnimated = false;
+  function animateTypewriter() {
+    if (typewriterAnimated) return;
+    typewriterAnimated = true;
+    const el = document.querySelector('.typewriter-text');
+    if (!el) return;
+    const text = el.dataset.text;
+    let i = 0;
+    el.textContent = '';
+    const interval = setInterval(() => {
+      el.textContent = text.slice(0, i + 1);
+      i++;
+      if (i >= text.length) {
+        clearInterval(interval);
+        setTimeout(() => el.classList.add('done'), 1500);
+      }
+    }, 100);
+  }
+
+  // Chegg chart animation
+  let cheggAnimated = false;
+  function animateCheggChart() {
+    if (cheggAnimated) return;
+    cheggAnimated = true;
+    const line = document.querySelector('.chegg-line');
+    const clipRect = document.querySelector('.chegg-clip-rect');
+    const dotsStart = document.querySelectorAll('.chegg-dot-start');
+    const dotsEnd = document.querySelectorAll('.chegg-dot-end');
+    const dropLabel = document.querySelector('.drop-label');
+    if (dropLabel) { dropLabel.classList.add('hidden'); }
+    requestAnimationFrame(() => {
+      if (line) line.classList.add('animate');
+      if (clipRect) clipRect.classList.add('animate');
+      dotsStart.forEach(d => d.classList.add('animate'));
+      dotsEnd.forEach(d => d.classList.add('animate'));
+      if (dropLabel) { setTimeout(() => dropLabel.classList.remove('hidden'), 2500); }
+    });
+  }
+
   // Intersection Observer
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting && entry.intersectionRatio > 0.5) {
         const index = Array.from(slides).indexOf(entry.target);
-        if (index >= 0) updateUI(index);
+        if (index >= 0) {
+          updateUI(index);
+          if (entry.target.classList.contains('slide-p3')) animateTypewriter();
+          if (entry.target.classList.contains('slide-p11')) animateCheggChart();
+        }
       }
     });
   }, { threshold: 0.5 });
